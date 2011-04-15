@@ -1,0 +1,13 @@
+python3 test_decode.py
+python3 test_default.py
+python3 test_dump.py
+python3 test_encode_basestring_ascii.py
+python3 test_fail.py
+python3 test_float.py
+python3 test_indent.py
+python3 test_pass1.py
+python3 test_pass2.py
+python3 test_pass3.py
+python3 test_recursion.py
+python3 test_scanstring.py
+python3 test_speedups.py

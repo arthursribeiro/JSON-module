@@ -12,7 +12,7 @@ NUMBER_RE = re.compile(
     r'(-?(?:0|[1-9]\d*))(\.\d+)?([eE][-+]?\d+)?',
     (re.VERBOSE | re.MULTILINE | re.DOTALL))
 
-def py_make_scanner(object context):
+def py_make_scanner(context):
     parse_object = context.parse_object
     parse_array = context.parse_array
     parse_string = context.parse_string
@@ -25,8 +25,7 @@ def py_make_scanner(object context):
     object_pairs_hook = context.object_pairs_hook
     memo = context.memo
 
-    def _scan_once(object string, int idx):
-        cdef char nextchar
+    def _scan_once(object string, idx):
         try:
             nextchar = string[idx]
         except IndexError:
@@ -63,7 +62,7 @@ def py_make_scanner(object context):
         else:
             raise StopIteration
 
-    def scan_once(object string, int idx):
+    def scan_once(string, idx):
         try:
             return _scan_once(string, idx)
         finally:

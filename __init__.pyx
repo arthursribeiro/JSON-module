@@ -103,8 +103,8 @@ __all__ = [
     'JSONDecoder', 'JSONEncoder',
 ]
 
-from .decoder import JSONDecoder
-from .encoder import JSONEncoder
+from decoder import JSONDecoder
+from encoder import JSONEncoder
 
 _default_encoder = JSONEncoder(
     skipkeys=False,
@@ -116,8 +116,8 @@ _default_encoder = JSONEncoder(
     default=None,
 )
 
-def dump(obj, fp, skipkeys=False, ensure_ascii=True, check_circular=True,
-        allow_nan=True, cls=None, indent=None, separators=None,
+def dump(obj, fp, bint skipkeys=False, bint ensure_ascii=True, bint check_circular=True,
+        bint allow_nan=True, cls=None, indent=None, separators=None,
         default=None, **kw):
     """Serialize ``obj`` as a JSON formatted stream to ``fp`` (a
     ``.write()``-supporting file-like object).
@@ -175,8 +175,8 @@ def dump(obj, fp, skipkeys=False, ensure_ascii=True, check_circular=True,
         fp.write(chunk)
 
 
-def dumps(obj, skipkeys=False, ensure_ascii=True, check_circular=True,
-        allow_nan=True, cls=None, indent=None, separators=None,
+def dumps(obj, bint skipkeys=False, bint ensure_ascii=True, bint check_circular=True,
+        bint allow_nan=True, cls=None, indent=None, separators=None,
         default=None, **kw):
     """Serialize ``obj`` to a JSON formatted ``str``.
 

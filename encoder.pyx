@@ -1,3 +1,4 @@
+# cython: language_level=3
 """Implementation of JSONEncoder
 """
 import re
@@ -32,7 +33,7 @@ for i in range(0x20):
 INFINITY = float('1e66666')
 FLOAT_REPR = repr
 
-def encode_basestring(char *s):
+def encode_basestring(s):
     """Return a JSON representation of a Python string
 
     """
@@ -41,12 +42,12 @@ def encode_basestring(char *s):
     return '"' + ESCAPE.sub(replace, s) + '"'
 
 
-def py_encode_basestring_ascii(char *s):
+def py_encode_basestring_ascii(s):
     """Return an ASCII-only JSON representation of a Python string
 
     """
     def replace(match):
-        cdef char* s
+        #cdef char* s
         cdef int n, s1, s2
         s0 = match.group(0)
         s = s0
@@ -106,7 +107,10 @@ cdef class JSONEncoder(object):
     cdef bint sort_keys
     cdef object indent 
     cdef object separators
-    cdef object default
+    cdef object defaultatr
+
+    cdef public key_separator
+    cdef public item_separator
     
     def __cinit__(self, bint skipkeys=False, bint ensure_ascii=True,
             bint check_circular=True, bint allow_nan=True, bint sort_keys=False,
@@ -149,6 +153,9 @@ cdef class JSONEncoder(object):
         version of the object or raise a ``TypeError``.
 
         """
+        self.key_separator = ": "
+        self.defaultatr = None
+        self.item_separator = ", "
 
         self.skipkeys = skipkeys
         self.ensure_ascii = ensure_ascii
@@ -158,8 +165,11 @@ cdef class JSONEncoder(object):
         self.indent = indent
         if separators is not None:
             self.item_separator, self.key_separator = separators
+        
         if default is not None:
-            self.default = default
+            self.defaultatr = default
+        else:
+            self.defaultatr = self.default
 
     def default(self, o):
         """Implement this method in a subclass such that it returns
@@ -227,7 +237,6 @@ cdef class JSONEncoder(object):
             # Check for specials.  Note that this type of test is processor
             # and/or platform-specific, so do tests which don't depend on the
             # internals.
-            cdef char* text
             if o != o:
                 text = 'NaN'
             elif o == _inf:
@@ -244,16 +253,15 @@ cdef class JSONEncoder(object):
 
             return text
 
-
         if (_one_shot and c_make_encoder is not None
                 and not self.indent):
             _iterencode = c_make_encoder(
-                markers, self.default, _encoder, self.indent,
+                markers, self.defaultatr, _encoder, self.indent,
                 self.key_separator, self.item_separator, self.sort_keys,
                 self.skipkeys, self.allow_nan)
         else:
             _iterencode = _make_iterencode(
-                markers, self.default, _encoder, self.indent, floatstr,
+                markers, self.defaultatr, _encoder, self.indent, floatstr,
                 self.key_separator, self.item_separator, self.sort_keys,
                 self.skipkeys, _one_shot)
         return _iterencode(o, 0)
@@ -276,7 +284,7 @@ def _make_iterencode(dict markers, _default, _encoder, _indent, _floatstr,
         _indent = ' ' * _indent
 
     def _iterencode_list(list lst, int _current_indent_level):
-        cdef int markerid
+        cdef unsigned long markerid
         if not lst:
             yield '[]'
             return
@@ -285,12 +293,10 @@ def _make_iterencode(dict markers, _default, _encoder, _indent, _floatstr,
             if markerid in markers:
                 raise ValueError("Circular reference detected")
             markers[markerid] = lst
-        cdef char* newline_indent, separator
         buf = '['
         if _indent is not None:
             _current_indent_level += 1
-            newline_indent0 = '\n' + _indent * _current_indent_level
-            newline_indent = newline_indent0
+            newline_indent = '\n' + _indent * _current_indent_level
             separator = _item_separator + newline_indent
             buf += newline_indent
         else:
@@ -306,24 +312,24 @@ def _make_iterencode(dict markers, _default, _encoder, _indent, _floatstr,
                 buf = separator
             if isinstance(lst[value], str):
                 yield buf + _encoder(lst[value])
-            elif value is None:
+            elif lst[value] is None:
                 yield buf + 'null'
-            elif value is True:
+            elif lst[value] is True:
                 yield buf + 'true'
-            elif value is False:
+            elif lst[value] is False:
                 yield buf + 'false'
-            elif isinstance(value, int):
-                yield buf + str(value)
-            elif isinstance(value, float):
-                yield buf + _floatstr(value)
+            elif isinstance(lst[value], intx):
+                yield buf + str(lst[value])
+            elif isinstance(lst[value], floatx):
+                yield buf + _floatstr(lst[value])
             else:
                 yield buf
-                if isinstance(value, (list, tuple)):
-                    chunks = _iterencode_list(value, _current_indent_level)
-                elif isinstance(value, dict):
-                    chunks = _iterencode_dict(value, _current_indent_level)
+                if isinstance(lst[value], (listx, tuple)):
+                    chunks = _iterencode_list(lst[value], _current_indent_level)
+                elif isinstance(lst[value], dictx):
+                    chunks = _iterencode_dict(lst[value], _current_indent_level)
                 else:
-                    chunks = _iterencode(value, _current_indent_level)
+                    chunks = _iterencode(lst[value], _current_indent_level)
                 for chunk in chunks:
                     yield chunk
         if newline_indent is not None:
@@ -334,8 +340,8 @@ def _make_iterencode(dict markers, _default, _encoder, _indent, _floatstr,
             del markers[markerid]
 
     def _iterencode_dict(dict dct, int _current_indent_level):
-        cdef int markerid
-        cdef char *newline_indent
+        cdef unsigned long markerid
+        #cdef char *newline_indent
         if not dct:
             yield '{}'
             return
