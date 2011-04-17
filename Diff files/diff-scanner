@@ -1,0 +1,14 @@
+28c28
+<     def _scan_once(string, int idx):
+---
+>     def _scan_once(string, idx):
+50,52c50
+<             integer = m.groups()[0]
+<             frac = m.groups()[1]
+<             exp = m.groups()[2]
+---
+>             integer, frac, exp = m.groups()
+67c65
+<     def scan_once(string, int idx):
+---
+>     def scan_once(string, idx):

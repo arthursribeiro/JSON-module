@@ -1,0 +1,98 @@
+8c8
+< from scanner import make_scanner
+---
+> from json.scanner import make_scanner
+18,19c18
+< cdef object _floatconstants():
+<     cdef bytes _BYTES
+---
+> def _floatconstants():
+21d19
+<     cdef double nan, inf
+29,30c27,28
+< def linecol(doc, int pos):
+<     cdef int lineco, colno
+---
+> 
+> def linecol(doc, pos):
+42c40,41
+< def errmsg(msg, doc, int pos, end=None):
+---
+> 
+> def errmsg(msg, doc, pos, end=None):
+44d42
+<     cdef int lineco, colno, endlineno, endcolno
+56a55
+> 
+70,71c69,70
+< def py_scanstring(s, int end, bint strict=True,
+<         dict _b=BACKSLASH, _m=STRINGCHUNK.match):
+---
+> def py_scanstring(s, end, strict=True,
+>         _b=BACKSLASH, _m=STRINGCHUNK.match):
+80,81c79
+<     cdef list chunks = []
+<     cdef int begin, uni, next_end, uni2
+---
+>     chunks = []
+142a141,142
+> 
+> # Use speedup if available
+148,150c148,150
+< def JSONObject(s_and_end, bint strict, scan_once_x, object_hook, object_pairs_hook,
+<                dict memo=None, _w=WHITESPACE.match, _ws=WHITESPACE_STR):
+<     cdef int end
+---
+> 
+> def JSONObject(s_and_end, strict, scan_once, object_hook, object_pairs_hook,
+>                memo=None, _w=WHITESPACE.match, _ws=WHITESPACE_STR):
+192c192
+<             value, end = scan_once_x(s, end)
+---
+>             value, end = scan_once(s, end)
+222,225c222
+< def JSONArray(s_and_end, scan_once_x, _w=WHITESPACE.match, _ws=WHITESPACE_STR):
+<     cdef int end
+<     cdef list values
+< 
+---
+> def JSONArray(s_and_end, scan_once, _w=WHITESPACE.match, _ws=WHITESPACE_STR):
+231,232c228
+<         nextch = s[end:end + 1]
+<         nextchar = nextch
+---
+>         nextchar = s[end:end + 1]
+239c235
+<             value, end = scan_once_x(s, end)
+---
+>             value, end = scan_once(s, end)
+246,247c242
+<             nextch = s[end:end + 1]
+<             nextchar = nextch
+---
+>             nextchar = s[end:end + 1]
+263c258,259
+< cdef class JSONDecoder(object):
+---
+> 
+> class JSONDecoder(object):
+292,302d287
+<     cdef public object object_hook
+<     cdef public object parse_float
+<     cdef public object parse_int
+<     cdef public object parse_constant
+<     cdef public bint strict
+<     cdef public object object_pairs_hook
+<     cdef public object parse_object
+<     cdef public object parse_array
+<     cdef public object parse_string
+<     cdef public dict memo
+<     cdef public object scan_once
+304c289
+<     def __cinit__(self, object_hook=None, parse_float=None,
+---
+>     def __init__(self, object_hook=None, parse_float=None,
+366c351
+<     def raw_decode(self, s, int idx=0):
+---
+>     def raw_decode(self, s, idx=0):

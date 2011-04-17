@@ -1,0 +1,150 @@
+26d25
+< cdef int i
+49d47
+<         cdef int n, s1, s2
+70c68
+< cdef class JSONEncoder(object):
+---
+> class JSONEncoder(object):
+99,113c97,100
+<     
+<     cdef bint skipkeys
+<     cdef bint ensure_ascii
+<     cdef bint check_circular
+<     cdef bint allow_nan
+<     cdef bint sort_keys
+<     cdef object indent 
+<     cdef object separators
+<     cdef object defaultatr
+< 
+<     cdef public key_separator
+<     cdef public item_separator
+<     
+<     def __cinit__(self, bint skipkeys=False, bint ensure_ascii=True,
+<             bint check_circular=True, bint allow_nan=True, bint sort_keys=False,
+---
+>     item_separator = ', '
+>     key_separator = ': '
+>     def __init__(self, skipkeys=False, ensure_ascii=True,
+>             check_circular=True, allow_nan=True, sort_keys=False,
+153,155d139
+<         self.key_separator = ": "
+<         self.defaultatr = None
+<         self.item_separator = ", "
+164,166c148
+<             self.item_separator = separators[0]
+<             self.key_separator = separators[1]
+<         
+---
+>             self.item_separator, self.key_separator = separators
+168,170c150
+<             self.defaultatr = default
+<         else:
+<             self.defaultatr = self.default
+---
+>             self.default = default
+213c193
+<     def iterencode(self, o, bint _one_shot=False):
+---
+>     def iterencode(self, o, _one_shot=False):
+223d202
+<         cdef dict markers
+233c212
+<         def floatstr(o, bint allow_nan=self.allow_nan,
+---
+>         def floatstr(o, allow_nan=self.allow_nan,
+254a234
+> 
+258c238
+<                 markers, self.defaultatr, _encoder, self.indent,
+---
+>                 markers, self.default, _encoder, self.indent,
+263c243
+<                 markers, self.defaultatr, _encoder, self.indent, floatstr,
+---
+>                 markers, self.default, _encoder, self.indent, floatstr,
+268,269c248,249
+< def _make_iterencode(dict markers, _default, _encoder, _indent, _floatstr,
+<         _key_separator, _item_separator, bint _sort_keys, bint _skipkeys, bint _one_shot,
+---
+> def _make_iterencode(markers, _default, _encoder, _indent, _floatstr,
+>         _key_separator, _item_separator, _sort_keys, _skipkeys, _one_shot,
+272,273c252,253
+<         dictx=dict,
+<         floatx=float,
+---
+>         dict=dict,
+>         float=float,
+275c255
+<         intx=int,
+---
+>         int=int,
+277,278c257,258
+<         listx=list,
+<         stri=str,
+---
+>         list=list,
+>         str=str,
+285c265
+<     def _iterencode_list(list lst, int _current_indent_level):
+---
+>     def _iterencode_list(lst, _current_indent_level):
+303d282
+<         cdef bint first
+305,306c284
+<         cdef int value
+<         for value in range(len(lst)):
+---
+>         for value in lst:
+311,313c289,291
+<             if isinstance(lst[value], stri):
+<                 yield buf + _encoder(lst[value])
+<             elif lst[value] is None:
+---
+>             if isinstance(value, str):
+>                 yield buf + _encoder(value)
+>             elif value is None:
+315c293
+<             elif lst[value] is True:
+---
+>             elif value is True:
+317c295
+<             elif lst[value] is False:
+---
+>             elif value is False:
+319,322c297,300
+<             elif isinstance(lst[value], intx):
+<                 yield buf + stri(lst[value])
+<             elif isinstance(lst[value], floatx):
+<                 yield buf + _floatstr(lst[value])
+---
+>             elif isinstance(value, int):
+>                 yield buf + str(value)
+>             elif isinstance(value, float):
+>                 yield buf + _floatstr(value)
+325,328c303,306
+<                 if isinstance(lst[value], (listx, tuple)):
+<                     chunks = _iterencode_list(lst[value], _current_indent_level)
+<                 elif isinstance(lst[value], dictx):
+<                     chunks = _iterencode_dict(lst[value], _current_indent_level)
+---
+>                 if isinstance(value, (list, tuple)):
+>                     chunks = _iterencode_list(value, _current_indent_level)
+>                 elif isinstance(value, dict):
+>                     chunks = _iterencode_dict(value, _current_indent_level)
+330c308
+<                     chunks = _iterencode(lst[value], _current_indent_level)
+---
+>                     chunks = _iterencode(value, _current_indent_level)
+340c318
+<     def _iterencode_dict(dict dct, int _current_indent_level):
+---
+>     def _iterencode_dict(dct, _current_indent_level):
+358d335
+<         cdef bint first
+360d336
+<         cdef list items
+418c394
+<     def _iterencode(o, int _current_indent_level):
+---
+>     def _iterencode(o, _current_indent_level):
