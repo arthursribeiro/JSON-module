@@ -1,4 +1,3 @@
-# cython: language_level=3
 """Implementation of JSONEncoder
 """
 import re
@@ -47,10 +46,8 @@ def py_encode_basestring_ascii(s):
 
     """
     def replace(match):
-        #cdef char* s
         cdef int n, s1, s2
-        s0 = match.group(0)
-        s = s0
+        s = match.group(0)
         try:
             return ESCAPE_DCT[s]
         except KeyError:
@@ -164,7 +161,8 @@ cdef class JSONEncoder(object):
         self.sort_keys = sort_keys
         self.indent = indent
         if separators is not None:
-            self.item_separator, self.key_separator = separators
+            self.item_separator = separators[0]
+            self.key_separator = separators[1]
         
         if default is not None:
             self.defaultatr = default
@@ -237,6 +235,7 @@ cdef class JSONEncoder(object):
             # Check for specials.  Note that this type of test is processor
             # and/or platform-specific, so do tests which don't depend on the
             # internals.
+
             if o != o:
                 text = 'NaN'
             elif o == _inf:
@@ -276,7 +275,7 @@ def _make_iterencode(dict markers, _default, _encoder, _indent, _floatstr,
         intx=int,
         isinstance=isinstance,
         listx=list,
-        str=str,
+        stri=str,
         tuple=tuple,
     ):
 
@@ -284,7 +283,6 @@ def _make_iterencode(dict markers, _default, _encoder, _indent, _floatstr,
         _indent = ' ' * _indent
 
     def _iterencode_list(list lst, int _current_indent_level):
-        cdef unsigned long markerid
         if not lst:
             yield '[]'
             return
@@ -310,7 +308,7 @@ def _make_iterencode(dict markers, _default, _encoder, _indent, _floatstr,
                 first = False
             else:
                 buf = separator
-            if isinstance(lst[value], str):
+            if isinstance(lst[value], stri):
                 yield buf + _encoder(lst[value])
             elif lst[value] is None:
                 yield buf + 'null'
@@ -319,7 +317,7 @@ def _make_iterencode(dict markers, _default, _encoder, _indent, _floatstr,
             elif lst[value] is False:
                 yield buf + 'false'
             elif isinstance(lst[value], intx):
-                yield buf + str(lst[value])
+                yield buf + stri(lst[value])
             elif isinstance(lst[value], floatx):
                 yield buf + _floatstr(lst[value])
             else:
@@ -340,8 +338,6 @@ def _make_iterencode(dict markers, _default, _encoder, _indent, _floatstr,
             del markers[markerid]
 
     def _iterencode_dict(dict dct, int _current_indent_level):
-        cdef unsigned long markerid
-        #cdef char *newline_indent
         if not dct:
             yield '{}'
             return
@@ -353,8 +349,7 @@ def _make_iterencode(dict markers, _default, _encoder, _indent, _floatstr,
         yield '{'
         if _indent is not None:
             _current_indent_level += 1
-            newline_indent0 = '\n' + _indent * _current_indent_level
-            newline_indent = newline_indent0
+            newline_indent = '\n' + _indent * _current_indent_level
             item_separator = _item_separator + newline_indent
             yield newline_indent
         else:
@@ -421,7 +416,6 @@ def _make_iterencode(dict markers, _default, _encoder, _indent, _floatstr,
             del markers[markerid]
 
     def _iterencode(o, int _current_indent_level):
-        cdef int markerid
         if isinstance(o, str):
             yield _encoder(o)
         elif o is None:

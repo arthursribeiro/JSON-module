@@ -25,7 +25,7 @@ def py_make_scanner(context):
     object_pairs_hook = context.object_pairs_hook
     memo = context.memo
 
-    def _scan_once(object string, idx):
+    def _scan_once(string, int idx):
         try:
             nextchar = string[idx]
         except IndexError:
@@ -47,7 +47,9 @@ def py_make_scanner(context):
 
         m = match_number(string, idx)
         if m is not None:
-            integer, frac, exp = m.groups()
+            integer = m.groups()[0]
+            frac = m.groups()[1]
+            exp = m.groups()[2]
             if frac or exp:
                 res = parse_float(integer + (frac or '') + (exp or ''))
             else:
@@ -62,7 +64,7 @@ def py_make_scanner(context):
         else:
             raise StopIteration
 
-    def scan_once(string, idx):
+    def scan_once(string, int idx):
         try:
             return _scan_once(string, idx)
         finally:

@@ -5,8 +5,7 @@ import re
 import sys
 import struct
 
-from json.scanner import make_scanner
-
+from scanner import make_scanner
 try:
     from _json import scanstring as c_scanstring
 except ImportError:
@@ -17,7 +16,8 @@ __all__ = ['JSONDecoder']
 FLAGS = re.VERBOSE | re.MULTILINE | re.DOTALL
 
 cdef object _floatconstants():
-    cdef bytes _BYTES = binascii.unhexlify(b'7FF80000000000007FF0000000000000')
+    cdef bytes _BYTES
+    _BYTES = binascii.unhexlify(b'7FF80000000000007FF0000000000000')
     cdef double nan, inf
     if sys.byteorder != 'big':
         _BYTES = _BYTES[:8][::-1] + _BYTES[8:][::-1]
@@ -171,8 +171,7 @@ def JSONObject(s_and_end, bint strict, scan_once_x, object_hook, object_pairs_ho
     end += 1
     while True:
         key, end = scanstring(s, end, strict)
-        k = memo_get(key, key)
-        key = k
+        key = memo_get(key, key)
         # To skip some function call overhead we optimize the fast paths where
         # the JSON key separator is ": " or just ":".
         if s[end:end + 1] != ':':
