@@ -1,3 +1,4 @@
+# cython: profile=True
 """Implementation of JSONEncoder
 """
 import re
@@ -302,6 +303,7 @@ def _make_iterencode(dict markers, _default, _encoder, _indent, _floatstr,
             separator = _item_separator
         cdef bint first
         first = True
+        
         cdef int value
         for value in range(len(lst)):
             if first:

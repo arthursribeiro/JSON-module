@@ -1,3 +1,4 @@
+# cython: profile=True
 r"""JSON (JavaScript Object Notation) <http://json.org> is a subset of
 JavaScript syntax (ECMA-262 3rd edition) used as a lightweight data
 interchange format.
@@ -229,7 +230,7 @@ def dumps(obj, bint skipkeys=False, bint ensure_ascii=True, bint check_circular=
         **kw).encode(obj)
 
 
-_default_decoder = JSONDecoder(object_hook=None, object_pairs_hook=None)
+cdef object _default_decoder = JSONDecoder(object_hook=None, object_pairs_hook=None)
 
 
 def load(fp, cls=None, object_hook=None, parse_float=None,

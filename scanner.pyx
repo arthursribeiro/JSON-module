@@ -1,3 +1,4 @@
+# cython: profile=True
 """JSON token scanner
 """
 import re

@@ -1,3 +1,4 @@
+# cython: profile=True
 """Implementation of JSONDecoder
 """
 import binascii
